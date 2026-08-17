@@ -1,0 +1,10 @@
+# dsh-gov — bundle patch layer. Composes over an EMPTY entry list, so `insert`.
+- insert:
+    - id: gov
+      name: 'dsh-gov'
+      config:
+        root: !!js dshHomePath('gov')
+        defaultPeriod: 'day'
+        defaultLimit: 0
+        prestepWarn: true
+        sectionOrder: 5
