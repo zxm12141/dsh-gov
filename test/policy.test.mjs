@@ -51,3 +51,18 @@ test("validateRules catches bad structures", () => {
   assert.ok(validateRules([{ id: "a", action: "allow" }, { id: "a", action: "deny" }]).length > 0);
   assert.equal(validateRules([{ id: "a", action: "allow" }]).length, 0);
 });
+
+test("globMatch handles multi-segment wildcards", () => {
+  assert.equal(globMatch("*write*", "my_writer"), true);
+  assert.equal(globMatch("*write*", "readonly"), false);
+  assert.equal(globMatch("a*b*c", "aXbYc"), true);
+});
+
+test("decide fails closed across agent/workspace scopes", () => {
+  const rules = [
+    { id: "w", workspaces: ["/prod/*"], action: "deny", priority: 5 },
+    { id: "a", agents: ["alice"], tool: "bash*", action: "allow", priority: 1 },
+  ];
+  assert.equal(decide(rules, { tool: "bash_x", agent: "alice", workspace: "/prod/app" }).decision, "deny");
+  assert.equal(decide(rules, { tool: "bash_x", agent: "alice", workspace: "/dev/app" }).decision, "allow");
+});

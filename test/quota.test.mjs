@@ -36,27 +36,12 @@ test("limit 0 means unlimited", () => {
 });
 
 
-test("globMatch handles multi-segment wildcards", () => {
-  assert.equal(globMatch("*write*", "my_writer"), true);
-  assert.equal(globMatch("*write*", "readonly"), false);
-  assert.equal(globMatch("a*b*c", "aXbYc"), true);
-});
-
-test("decide fails closed across agent/workspace scopes", () => {
-  const rules = [
-    { id: "w", workspaces: ["/prod/*"], action: "deny", priority: 5 },
-    { id: "a", agents: ["alice"], tool: "bash*", action: "allow", priority: 1 },
-  ];
-  assert.equal(decide(rules, { tool: "bash_x", agent: "alice", workspace: "/prod/app" }).decision, "deny");
-  assert.equal(decide(rules, { tool: "bash_x", agent: "alice", workspace: "/dev/app" }).decision, "allow");
-});
-
 test("quota week period rolls over", () => {
   const mon = Date.UTC(2026, 7, 17, 0, 0, 0); // Monday
   const q = newQuota("week", 100, mon);
   q.used = 50;
-  applyTokens(q, 60, Date.UTC(2026, 7, 18, 12, 0, 0)); // Tuesday same week
-  assert.equal(q.exceeded, true);
+  const r = applyTokens(q, 60, Date.UTC(2026, 7, 18, 12, 0, 0)); // Tuesday same week
+  assert.equal(r.exceeded, true);
   resetIfNeeded(q, Date.UTC(2026, 7, 24, 0, 0, 0)); // next Monday
   assert.equal(q.used, 0);
 });
