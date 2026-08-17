@@ -58,6 +58,14 @@ gov audit_query decision=deny limit=20
 node test/policy.test.mjs && node test/audit.test.mjs && node test/quota.test.mjs
 ```
 
+
+## FAQ
+
+- **默认放行还是默认拒绝？** 默认 `allow`（与 DSH 一致）；需要收紧就加规则，平局时 fail-closed（deny > ask > allow）。
+- **审计日志会记录工具参数吗？** 不会。只记工具名、agent、工作区、决定、理由、结果（成功/失败）——不含参数内容。
+- **配额按什么计？** 宿主 `tokenMeter` 的 `totalTokens`（当前请求+响应压力），按 agent id 累计到周期。
+- **计量失败会卡住 agent 吗？** 不会，fail-safe：计量/持久化异常时跳过该步。
+
 ## License
 
 MIT
